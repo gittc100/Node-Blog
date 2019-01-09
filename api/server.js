@@ -44,7 +44,7 @@ server.use(cors()); // security cross domain
 //   res.send(`sanity check success`);
 // });
 
-// get all
+// get all users
 server.get("/api/users", (req, res) => {
   userDB
     .get()
@@ -57,6 +57,27 @@ server.get("/api/users", (req, res) => {
       });
     });
 });
+
+// get all posts
+server.get("/api/users/:userID/posts", (req, res) => {
+    const { userID } = req.params;
+    userDB
+      .getUserPosts(userID)
+      .then(posts => {
+        if (posts.length > 0) {
+          res.status(200).json(posts);
+        } else {
+          res
+            .status(404)
+            .json({ message: `User ID ${userID} does not have any Posts.` });
+        }
+      })
+      .catch(() =>
+        res
+          .status(500)
+          .json({ error: "The User information could not be retrieved." })
+      );
+  });
 
 // get by id
 server.get("/api/users/:id", (req, res) => {
