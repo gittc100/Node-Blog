@@ -14,12 +14,14 @@ const server = express();
 // Custom Middleware
 
 function checkAllCaps(req, res, next){
-    const name = req.body.name;
+    const { name } = req.body;
     const arr = name.split(" ");
     let result;
     for(let i = 0; i < arr.length; i++){
-        if(arr[i][0] !== arr[i][0].toUpperCase()){
+        let firstLetter = arr[i][0];
+        if(firstLetter !== firstLetter.toUpperCase()){
             result = false;
+            break;
         }else{
             result = true;
         }
