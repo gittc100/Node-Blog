@@ -229,6 +229,50 @@ server.get("/api/users/:userID/posts/:postID", (req, res) => {
     );
 });
 
+// get post tags by id
+
+server.get("/api/users/:userID/posts/:postID/tags", (req, res) => {
+  const { userID, postID } = req.params;
+  userDB
+    .getUserPosts(userID)
+    .then(posts => {
+      if (posts.length > 0) {
+        let user = posts[0].postedBy; // check for post id ownership, post id will otherwise show for incorrect user
+        postDB
+          .get(postID)
+          .then(post => {
+            if (post.postedBy === user) {
+              if(post.tags.length > 0){
+                res.status(200).json(post.tags);
+              }else{
+                res.status(404).json({
+                  message: `User ID ${userID} Post ID ${postID} does not contain tags.`
+                });
+              }
+            } else {
+              res.status(404).json({
+                message: `Post ID ${postID} does not exist for ${user}.`
+              });
+            }
+          })
+          .catch(() =>
+            res
+              .status(500)
+              .json({ error: "The User information could not be retrieved." })
+          );
+      } else {
+        res
+          .status(404)
+          .json({ message: `User ID ${userID} does not have any Posts.` });
+      }
+    })
+    .catch(() =>
+      res
+        .status(500)
+        .json({ error: "The User information could not be retrieved." })
+    );
+});
+
 // post post
 
 server.post("/api/users/:userID/posts", (req, res) => {
